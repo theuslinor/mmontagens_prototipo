@@ -58,7 +58,7 @@ const coresUnicas = [...new Set(prod.variants.map(v => v.cor))];
                     <div class="mb-8">
                         <label class="block text-xs font-black text-gray-400 uppercase mb-3">Selecione a opção de TAMANHO:</label>
                         <div class="flex flex-wrap gap-2" id="size-options">
-                            </div>
+                             </div>
                     </div>
 
                     <div class="bg-gray-50 p-6 rounded-2xl border border-gray-100 mb-6 flex flex-col gap-4">
@@ -79,8 +79,15 @@ const coresUnicas = [...new Set(prod.variants.map(v => v.cor))];
                         </div>
                     </div>
 
-                    <button onclick="window.enviarCarrinhoFinal()" class="w-full bg-[#25D366] text-white font-black py-5 rounded-2xl shadow-lg hover:bg-[#20ba5a] transition-all flex justify-center items-center gap-4 text-xl uppercase tracking-wider">
-                        <i class="fas fa-cart-plus text-2xl"></i> Adicionar ao Orçamento
+                    <button 
+                        id="btn-add-orcamento"
+                        onclick="window.enviarCarrinhoFinal(event)" 
+                        class="w-full bg-[#25D366] text-white font-black py-5 rounded-2xl shadow-lg transition-all duration-500 flex justify-center items-center gap-4 text-xl uppercase tracking-wider overflow-hidden relative"
+                    >
+                        <span id="btn-content" class="flex items-center gap-4">
+                            <i class="fas fa-cart-plus text-2xl"></i> 
+                            <span>Adicionar ao Orçamento</span>
+                        </span>
                     </button>
                 </div>
             </div>
@@ -89,10 +96,12 @@ const coresUnicas = [...new Set(prod.variants.map(v => v.cor))];
 </LayoutBase>
 
 <script is:inline define:vars={{ variants: prod.variants, slug: prod.slug, nome: prod.nome, codigo: prod.codigo }}>
+    // Inicialização do estado
     let corSelecionada = variants[0].cor;
     let tamanhoSelecionado = "";
-    let precoAtual = 0;
+    let precoAtual = variants[0].price; // Começa com o preço da primeira variante
 
+    // Tenta carregar a melhor extensão de imagem disponível
     async function carregarImagemInteligente(caminhoBase) {
         const imgElement = document.getElementById('main-img');
         const extensoes = ['.png', '.jpg', '.jpeg', '.webp', '.PNG', '.JPG', '.JPEG'];
@@ -111,12 +120,20 @@ const coresUnicas = [...new Set(prod.variants.map(v => v.cor))];
         imgElement.src = caminhoBase;
     }
 
+    // Atualiza os displays de preço e subtotal
     window.atualizarTotal = function() {
-        const qty = parseInt(document.getElementById('qty-input').value) || 1;
+        const qtyElement = document.getElementById('qty-input');
+        const qty = parseInt(qtyElement.value) || 1;
+        
         const total = precoAtual * qty;
-        document.getElementById('display-total').innerText = total.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        
+        const displayTotal = document.getElementById('display-total');
+        if (displayTotal) {
+            displayTotal.innerText = total.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
     };
 
+    // Lógica de troca de cor
     window.mudarCor = function(cor, btn) {
         corSelecionada = cor;
         document.querySelectorAll('.color-btn').forEach(b => {
@@ -129,6 +146,7 @@ const coresUnicas = [...new Set(prod.variants.map(v => v.cor))];
         renderizarTamanhos(tamanhosDisponiveis);
     };
 
+    // Lógica de troca de tamanho
     window.mudarTamanho = function(variante, btn) {
         tamanhoSelecionado = variante.tamanho;
         precoAtual = variante.price;
@@ -145,6 +163,7 @@ const coresUnicas = [...new Set(prod.variants.map(v => v.cor))];
         window.atualizarTotal();
     };
 
+    // Renderiza botões de tamanho baseado na cor
     function renderizarTamanhos(lista) {
         const container = document.getElementById('size-options');
         container.innerHTML = '';
@@ -161,18 +180,47 @@ const coresUnicas = [...new Set(prod.variants.map(v => v.cor))];
         });
     }
 
-    window.enviarCarrinhoFinal = function() {
-        const qty = parseInt(document.getElementById('qty-input').value) || 1;
-        const img = document.getElementById('main-img').src;
-        const variacaoFull = `${corSelecionada} - ${tamanhoSelecionado}`;
+    // Adiciona ao carrinho com feedback visual
+    // Criamos uma variável fora da função para controlar o tempo
+let timeoutFeedback; 
 
-        if (window.adicionarComVariacaoInterna) {
-            window.adicionarComVariacaoInterna(slug, nome, codigo, img, qty, variacaoFull, precoAtual);
-        } else {
-            console.error("Erro: carrinho.js não carregado.");
-        }
-    };
+window.enviarCarrinhoFinal = function(event) {
+    const btn = event.currentTarget;
+    const btnContent = document.getElementById('btn-content');
+    
+    // Texto e ícone originais fixos (pra não bugar se clicar rápido)
+    const conteudoOriginal = `<i class="fas fa-cart-plus text-2xl"></i> <span>Adicionar ao Orçamento</span>`;
 
+    const qty = parseInt(document.getElementById('qty-input').value) || 1;
+    const img = document.getElementById('main-img').src;
+    const variacaoFull = `${corSelecionada} - ${tamanhoSelecionado}`;
+
+    if (window.adicionarComVariacaoInterna) {
+        // Envia para o carrinho (isso pode acontecer quantas vezes ele clicar)
+        window.adicionarComVariacaoInterna(slug, nome, codigo, img, qty, variacaoFull, precoAtual);
+        
+        // --- LÓGICA DO FEEDBACK VISUAL ---
+        
+        // Se já houver um timer rodando, a gente cancela ele pra começar um novo
+        if (timeoutFeedback) clearTimeout(timeoutFeedback);
+
+        // Forçamos o estado "Adicionado" (Azul)
+        btn.style.backgroundColor = '#1489c8'; // Cor mm-blue fixa
+        btnContent.innerHTML = '<i class="fas fa-check text-2xl"></i> <span>Adicionado!</span>';
+
+        // Marcamos o tempo para voltar ao normal (Verde)
+        timeoutFeedback = setTimeout(() => {
+            btn.style.backgroundColor = '#25D366'; // Volta pro verde
+            btnContent.innerHTML = conteudoOriginal;
+            timeoutFeedback = null; // Limpa a trava
+        }, 1500);
+
+    } else {
+        console.error("Erro: carrinho.js não carregado.");
+    }
+};
+
+    // Init
     document.addEventListener('DOMContentLoaded', () => {
         const primeiraCorBtn = document.querySelector('.color-btn');
         if(primeiraCorBtn) window.mudarCor(corSelecionada, primeiraCorBtn);

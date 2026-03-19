@@ -26,7 +26,6 @@ window.adicionarComVariacaoInterna = function(slug, nome, codigo, img, qty, vari
     }
 
     salvarCarrinho(carrinho);
-    alert("Produto adicionado ao orçamento!");
 };
 
 // Função para atualizar as bolinhas de contagem no site
