@@ -245,17 +245,17 @@
                 const preco = parseFloat(i.preco) || 0;
                 const subtotal = i.qty * preco;
                 totalGeral += subtotal;
-                texto += `📦 *${i.qty}x ${i.nome}*%0A`;
-                texto += `🔹 Opção: ${i.variacao}%0A`;
-                texto += `💰 UN: R$ ${preco.toFixed(2).replace('.', ',')} | *SUBTOTAL: R$ ${subtotal.toFixed(2).replace('.', ',')}*%0A%0A`;
+                texto += ` *${i.qty}x ${i.nome}*%0A`;
+                texto += ` Opção: ${i.variacao}%0A`;
+                texto += ` UN: R$ ${preco.toFixed(2).replace('.', ',')} | *SUBTOTAL: R$ ${subtotal.toFixed(2).replace('.', ',')}*%0A%0A`;
             });
             
             texto += `---------------------------------%0A`;
-            texto += `✅ *VALOR TOTAL: R$ ${totalGeral.toFixed(2).replace('.', ',')}*%0A%0A`;
+            texto += ` *VALOR TOTAL: R$ ${totalGeral.toFixed(2).replace('.', ',')}*%0A%0A`;
             texto += "Aguardamos o retorno com as condições de frete e faturamento.";
             
             // Link corrigido para o seu número de Pernambuco
-            window.open(`https://wa.me/55819932433674?text=${texto}`, "_blank");
+            window.open(`https://wa.me/5511998038196?text=${texto}`, "_blank");
         }
 
         window.addEventListener('DOMContentLoaded', renderizarPaginaCarrinho);
