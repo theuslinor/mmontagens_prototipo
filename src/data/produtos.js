@@ -102,7 +102,7 @@ export const categorias = [
       {
         // ESSE CARA AQUI TEM QUE SER IGUAL AO QUE VOCÊ DIGITA NA URL
         slug: 'suporte-expositor-facas', 
-        nome: 'Suporte Expositor para Facas',
+        nome: '[MOSTRUÁRIO] Suporte Expositor para Facas',
         codigo: 'SUP-001',
         img: '/midia/suportes/suporte-faca.jpeg',
         variants: [
