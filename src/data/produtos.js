@@ -110,5 +110,59 @@ export const categorias = [
         ]
       }
     ]
+  },
+  {
+    id: 'gondolas',
+    nome: 'Gôndolas',
+    banner: 'https://images.unsplash.com/photo-1534452203293-494d7ddbf7e0?auto=format&fit=crop&q=80',
+    items: [
+      {
+        slug: 'estantes-planejadas',
+        nome: 'Estantes Planejadas',
+        codigo: 'GON-EST',
+        img: '/midia/gondolas/estantes-planejadas/estante-planejada-1.jpeg',
+        // Slider com todas as 9 fotos da pasta
+        images: [
+          '/midia/gondolas/estantes-planejadas/estante-industrial-planejada.jpeg',
+          '/midia/gondolas/estantes-planejadas/estante-industrial-planejada-1.jpeg',
+          '/midia/gondolas/estantes-planejadas/estante-parede.jpeg',
+          '/midia/gondolas/estantes-planejadas/estante-parede-2.jpeg',
+          '/midia/gondolas/estantes-planejadas/estante-parede-3.jpeg',
+          '/midia/gondolas/estantes-planejadas/estante-parede-4.jpeg',
+          '/midia/gondolas/estantes-planejadas/estante-planejada-1.jpeg',
+          '/midia/gondolas/estantes-planejadas/estante-suspensa.jpeg',
+          '/midia/gondolas/estantes-planejadas/estante-suspensa-1.jpeg'
+        ],
+        variants: []
+      },
+      {
+        slug: 'gondolas-planejadas',
+        nome: 'Gôndolas Planejadas',
+        codigo: 'GON-CEN',
+        img: '/midia/gondolas/gondolas-planejadas/gondola-1.jpeg',
+        images: [
+          '/midia/gondolas/gondolas-planejadas/gondola-1.jpeg',
+          '/midia/gondolas/gondolas-planejadas/gondola-2.jpeg',
+          '/midia/gondolas/gondolas-planejadas/gondola-expositora.jpeg',
+          '/midia/gondolas/gondolas-planejadas/gondola-expositora-1.jpeg',
+          '/midia/gondolas/gondolas-planejadas/gondola-expositora-2.jpeg',
+          '/midia/gondolas/gondolas-planejadas/gondola-expositora-3.jpeg',
+          '/midia/gondolas/gondolas-planejadas/gondolas.jpeg'
+        ],
+        variants: []
+      },
+      {
+        slug: 'mesas-planejadas',
+        nome: 'Mesas Planejadas',
+        codigo: 'GON-MIX',
+        img: '/midia/gondolas/mesas-planejadas/mesa-planejada.jpeg',
+        images: [
+          '/midia/gondolas/mesas-planejadas/mesa-planejada.jpeg',
+          '/midia/gondolas/mesas-planejadas/mesa-planejada-1.jpeg',
+          '/midia/gondolas/mesas-planejadas/mesa-planejada-2.jpeg',
+        ],
+        variants: []
+      }
+    ]
   }
 ];

@@ -3,7 +3,7 @@
 import LayoutBase from '../../layouts/LayoutBase.astro';
 import { categorias } from '../../data/produtos.js';
 
-// Filtramos a categoria de gôndolas do seu arquivo de dados central
+// Filtramos a categoria de gôndolas
 const categoria = categorias.find(cat => cat.id === 'gondolas');
 const produtos = categoria ? categoria.items : [];
 ---
@@ -32,30 +32,33 @@ const produtos = categoria ? categoria.items : [];
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
                 {produtos.map(p => (
                     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden group">
-                        <div class="aspect-square bg-gray-50 p-8 flex items-center justify-center overflow-hidden">
+                        
+                        <a 
+                            href={`/produtos/${p.slug}`}
+                            class="aspect-square bg-gray-50 p-8 flex items-center justify-center overflow-hidden relative card-image-container"
+                            data-images={JSON.stringify(p.images && p.images.length > 0 ? p.images : [p.img])}
+                        >
                             <img 
                                 src={p.img} 
                                 alt={p.nome} 
-                                class="max-h-full object-contain mix-blend-multiply group-hover:scale-110 transition duration-500"
+                                class="max-h-full object-contain mix-blend-multiply group-hover:scale-110 transition duration-500 card-main-img"
                                 onerror="this.src='/midia/logo4.png'"
                             />
-                        </div>
+                        </a>
                         
                         <div class="p-6 flex flex-col flex-grow">
-                            <h3 class="font-black text-gray-900 text-lg mb-1 leading-tight">{p.nome}</h3>
-                            <p class="text-[10px] font-bold text-gray-400 uppercase mb-4 tracking-widest">A partir de</p>
+                            <h3 class="font-black text-gray-900 text-lg mb-1 leading-tight uppercase">{p.nome}</h3>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase mb-4 tracking-widest italic">Projeto Personalizado</p>
                             
                             <div class="mt-auto flex items-center justify-between">
-                                <span class="text-2xl font-black text-mm-blue">
-                                    {p.variants && p.variants[0] 
-                                        ? `R$ ${p.variants[0].price.toFixed(2).replace('.', ',')}` 
-                                        : 'Sob Consulta'}
+                                <span class="text-xl font-black text-mm-blue uppercase tracking-tight">
+                                    A Combinar
                                 </span>
                                 <a 
                                     href={`/produtos/${p.slug}`} 
                                     class="bg-mm-blue hover:bg-mm-darkblue text-white px-5 py-2.5 rounded-lg font-bold text-sm transition-all shadow-md hover:shadow-lg"
                                 >
-                                    Ver Opções
+                                    Ver Detalhes
                                 </a>
                             </div>
                         </div>
@@ -71,3 +74,38 @@ const produtos = categoria ? categoria.items : [];
         </div>
     </section>
 </LayoutBase>
+
+<style>
+    /* Transição suave para a troca de imagens no card */
+    .card-main-img {
+        transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+    }
+</style>
+
+<script>
+    // Lógica para rotacionar as imagens nos cards a cada 2 segundos
+    const containers = document.querySelectorAll('.card-image-container');
+
+    containers.forEach(container => {
+        const images = JSON.parse(container.getAttribute('data-images') || '[]');
+        const imgElement = container.querySelector('.card-main-img') as HTMLImageElement;
+
+        if (images.length > 1 && imgElement) {
+            let currentIndex = 0;
+
+            setInterval(() => {
+                // Efeito de fade out rápido
+                imgElement.style.opacity = '0.3';
+
+                setTimeout(() => {
+                    currentIndex = (currentIndex + 1) % images.length;
+                    // Troca o link da imagem (usa encodeURI para prevenir erro com espaços)
+                    imgElement.src = encodeURI(images[currentIndex]);
+                    
+                    // Volta a opacidade
+                    imgElement.style.opacity = '1';
+                }, 500); // Metade do tempo da transição CSS
+            }, 5000); // 2 segundos
+        }
+    });
+</script>

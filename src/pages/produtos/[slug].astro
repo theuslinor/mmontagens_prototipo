@@ -12,8 +12,13 @@ export async function getStaticPaths() {
 
 const { prod } = Astro.props;
 
-// Pegamos as cores únicas para gerar os botões iniciais
-const coresUnicas = [...new Set(prod.variants.map(v => v.cor))];
+// LÓGICA DE DADOS
+const temVariantes = prod.variants && prod.variants.length > 0;
+
+// Se for projeto (Gôndolas/Estantes), usamos o slider. Se for produto comum, imagem única.
+const slides = !temVariantes && prod.images ? prod.images : [prod.img];
+const coresUnicas = temVariantes ? [...new Set(prod.variants.map(v => v.cor))] : [];
+const precoInicial = temVariantes ? prod.variants[0].price : 0;
 ---
 
 <LayoutBase title={`${prod.nome} - MM Montagens`}>
@@ -21,11 +26,8 @@ const coresUnicas = [...new Set(prod.variants.map(v => v.cor))];
         <div class="container mx-auto px-6 lg:px-24">
             
             <div class="mb-8">
-                <button 
-                    onclick="history.back()" 
-                    class="inline-flex items-center gap-2 text-gray-400 hover:text-mm-blue font-bold transition-all group text-sm uppercase tracking-widest"
-                >
-                    <div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-blue-50 transition-colors">
+                <button onclick="history.back()" class="inline-flex items-center gap-2 text-gray-400 hover:text-mm-blue font-bold transition-all group text-sm uppercase tracking-widest">
+                    <div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-blue-50">
                         <i class="fas fa-arrow-left text-xs"></i>
                     </div>
                     Voltar
@@ -34,59 +36,104 @@ const coresUnicas = [...new Set(prod.variants.map(v => v.cor))];
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
                 
-                <div class="bg-gray-50 rounded-2xl p-8 flex items-center justify-center border border-gray-100 shadow-inner">
-                    <img id="main-img" src={prod.variants[0].img} alt={prod.nome} class="max-h-[400px] object-contain mix-blend-multiply transition-all duration-300" />
+                <div class="relative bg-gray-50 rounded-[32px] p-4 md:p-8 border border-gray-100 shadow-inner group overflow-hidden h-[400px] md:h-[550px] flex items-center justify-center">
+                    
+                    {temVariantes ? (
+                        <img 
+                            id="main-img" 
+                            src={prod.variants[0].img} 
+                            alt={prod.nome} 
+                            class="max-h-full object-contain mix-blend-multiply transition-all duration-300"
+                            onerror="this.src='/midia/logo4.png'"
+                        />
+                    ) : (
+                        <div id="slider-container" class="relative w-full h-full flex items-center justify-center">
+                            {slides.map((img, index) => (
+                                <img 
+                                    src={img} 
+                                    alt={`${prod.nome} - ${index}`}
+                                    class={`absolute max-h-full object-contain mix-blend-multiply transition-all duration-1000 ease-in-out transform ${index === 0 ? 'opacity-100 scale-100 z-10' : 'opacity-0 scale-95 z-0'}`}
+                                    data-index={index}
+                                />
+                            ))}
+
+                            {slides.length > 1 && (
+                                <>
+                                    <button id="prev-slide" class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 shadow-md z-20 flex items-center justify-center text-mm-darkblue hover:bg-mm-blue hover:text-white transition-all">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </button>
+                                    <button id="next-slide" class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 shadow-md z-20 flex items-center justify-center text-mm-darkblue hover:bg-mm-blue hover:text-white transition-all">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </button>
+                                    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+                                        {slides.map((_, i) => (
+                                            <div class={`slider-dot h-1.5 rounded-full transition-all duration-500 ${i === 0 ? 'bg-mm-blue w-8' : 'bg-gray-300 w-3'}`} data-index={i}></div>
+                                        ))}
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    )}
                 </div>
 
                 <div class="flex flex-col">
-                    <h1 class="text-3xl font-black text-gray-900 mb-6">{prod.nome}</h1>
+                    <h1 class="text-3xl md:text-4xl font-black text-gray-900 mb-2 uppercase tracking-tight">{prod.nome}</h1>
+                    <p class="text-sm text-gray-400 mb-8 italic">Código: {prod.codigo}</p>
 
-                    <div class="mb-6">
-                        <label class="block text-xs font-black text-gray-400 uppercase mb-3">Selecione a opção de COR:</label>
-                        <div class="flex flex-wrap gap-2" id="color-options">
-                            {coresUnicas.map((cor, index) => (
-                                <button 
-                                    class={`color-btn px-6 py-2 border-2 rounded-lg font-bold text-sm transition-all ${index === 0 ? 'border-mm-blue text-mm-blue bg-blue-50' : 'border-gray-200 text-gray-400'}`}
-                                    onclick={`window.mudarCor('${cor}', this)`}
-                                >
-                                    {cor}
-                                </button>
-                            ))}
+                    {temVariantes ? (
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-400 uppercase mb-3 tracking-widest">Selecione a Cor:</label>
+                                <div class="flex flex-wrap gap-2">
+                                    {coresUnicas.map((cor, index) => (
+                                        <button 
+                                            class={`color-btn px-6 py-2 border-2 rounded-xl font-bold text-sm transition-all ${index === 0 ? 'border-mm-blue text-mm-blue bg-blue-50' : 'border-gray-200 text-gray-400'}`}
+                                            onclick={`window.mudarCor('${cor}', this)`}
+                                        >
+                                            {cor}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-400 uppercase mb-3 tracking-widest">Tamanho Disponível:</label>
+                                <div class="flex flex-wrap gap-2" id="size-options"></div>
+                            </div>
                         </div>
-                    </div>
+                    ) : (
+                        <div class="bg-blue-50 p-8 rounded-3xl border border-blue-100 border-l-8 border-l-mm-blue">
+                            <h4 class="text-mm-blue font-black uppercase text-sm mb-2 italic">Projeto Personalizado</h4>
+                            <p class="text-gray-600 text-sm leading-relaxed font-medium">
+                                Gôndolas e Estantes são fabricadas sob medida. Entre em contato para receber um layout exclusivo para sua loja.
+                            </p>
+                        </div>
+                    )}
 
-                    <div class="mb-8">
-                        <label class="block text-xs font-black text-gray-400 uppercase mb-3">Selecione a opção de TAMANHO:</label>
-                        <div class="flex flex-wrap gap-2" id="size-options">
-                             </div>
-                    </div>
-
-                    <div class="bg-gray-50 p-6 rounded-2xl border border-gray-100 mb-6 flex flex-col gap-4">
+                    <div class="bg-gray-50 p-6 rounded-3xl border border-gray-100 my-8 flex flex-col gap-6">
                         <div class="flex justify-between items-end">
                             <div>
                                 <span class="block text-[10px] font-black text-gray-400 uppercase mb-1">Preço Unitário</span>
-                                <span class="text-2xl font-bold text-gray-600">R$ <span id="display-price">0,00</span></span>
+                                <span class="text-3xl font-black text-gray-700">
+                                    {temVariantes ? (<>R$ <span id="display-price">{precoInicial.toFixed(2).replace('.', ',')}</span></>) : "A Combinar"}
+                                </span>
                             </div>
-                            <div class="flex flex-col items-center gap-1">
-                                <label class="text-[10px] font-black text-gray-400 uppercase">Qtd</label>
-                                <input id="qty-input" type="number" min="1" value="1" oninput="window.atualizarTotal()" class="w-20 p-3 border-2 border-gray-200 rounded-lg text-center font-bold outline-none focus:border-mm-blue" />
+                            <div class="text-center">
+                                <label class="block text-[10px] font-black text-gray-400 uppercase mb-1">Qtd:</label>
+                                <input id="qty-input" type="number" min="1" value="1" oninput="window.atualizarTotal()" class="w-16 p-3 border-2 border-gray-200 rounded-xl text-center font-bold outline-none focus:border-mm-blue" />
                             </div>
                         </div>
-                        
-                        <div class="border-t border-gray-200 pt-4 flex justify-between items-center">
-                            <span class="text-xs font-black text-gray-900 uppercase tracking-tighter">Subtotal</span>
-                            <span class="text-4xl font-black text-mm-blue">R$ <span id="display-total">0,00</span></span>
+                        <div class="border-t border-gray-200 pt-6 flex justify-between items-center">
+                            <span class="text-xs font-black text-gray-900 uppercase">Subtotal</span>
+                            <span class="text-4xl font-black text-mm-blue">
+                                {temVariantes ? (<>R$ <span id="display-total">{precoInicial.toFixed(2).replace('.', ',')}</span></>) : "Sob Consulta"}
+                            </span>
                         </div>
                     </div>
 
-                    <button 
-                        id="btn-add-orcamento"
-                        onclick="window.enviarCarrinhoFinal(event)" 
-                        class="w-full bg-[#25D366] text-white font-black py-5 rounded-2xl shadow-lg transition-all duration-500 flex justify-center items-center gap-4 text-xl uppercase tracking-wider overflow-hidden relative"
-                    >
+                    <button onclick="window.enviarCarrinhoFinal(event)" class="w-full bg-[#25D366] hover:bg-[#1da851] text-white font-black py-5 rounded-2xl shadow-xl transition-all duration-300 flex justify-center items-center gap-4 text-xl uppercase">
                         <span id="btn-content" class="flex items-center gap-4">
-                            <i class="fas fa-cart-plus text-2xl"></i> 
-                            <span>Adicionar ao Orçamento</span>
+                            <i class="fas fa-cart-plus"></i> 
+                            <span>{temVariantes ? "Adicionar ao Orçamento" : "Solicitar Orçamento"}</span>
                         </span>
                     </button>
                 </div>
@@ -95,134 +142,96 @@ const coresUnicas = [...new Set(prod.variants.map(v => v.cor))];
     </section>
 </LayoutBase>
 
-<script is:inline define:vars={{ variants: prod.variants, slug: prod.slug, nome: prod.nome, codigo: prod.codigo }}>
-    // Inicialização do estado
-    let corSelecionada = variants[0].cor;
-    let tamanhoSelecionado = "";
-    let precoAtual = variants[0].price; // Começa com o preço da primeira variante
+<script is:inline define:vars={{ variants: prod.variants, slug: prod.slug, nome: prod.nome, codigo: prod.codigo, temVariantes }}>
+    let currentSlide = 0;
+    let precoAtual = temVariantes ? variants[0].price : 0;
+    let corSelecionada = temVariantes ? variants[0].cor : "PADRÃO";
+    let tamanhoSelecionado = temVariantes ? variants[0].tamanho : "ÚNICO";
 
-    // Tenta carregar a melhor extensão de imagem disponível
-    async function carregarImagemInteligente(caminhoBase) {
-        const imgElement = document.getElementById('main-img');
-        const extensoes = ['.png', '.jpg', '.jpeg', '.webp', '.PNG', '.JPG', '.JPEG'];
-        const caminhoSemExtensao = caminhoBase.replace(/\.[^/.]+$/, "");
+    // --- LÓGICA DO SLIDER (SÓ PARA PROJETOS) ---
+    if (!temVariantes) {
+        const slidesImg = document.querySelectorAll('#slider-container img');
+        const dots = document.querySelectorAll('.slider-dot');
 
-        for (let ext of extensoes) {
-            const urlTeste = caminhoSemExtensao + ext;
-            try {
-                const response = await fetch(urlTeste, { method: 'HEAD' });
-                if (response.ok) {
-                    imgElement.src = urlTeste;
-                    return;
-                }
-            } catch (e) {}
+        function showSlide(index) {
+            if (slidesImg.length <= 1) return;
+            if (index >= slidesImg.length) currentSlide = 0;
+            else if (index < 0) currentSlide = slidesImg.length - 1;
+            else currentSlide = index;
+
+            slidesImg.forEach((img, i) => {
+                img.style.opacity = i === currentSlide ? '1' : '0';
+                img.style.zIndex = i === currentSlide ? '10' : '0';
+                img.style.transform = i === currentSlide ? 'scale(1)' : 'scale(0.95)';
+            });
+
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('bg-mm-blue', i === currentSlide);
+                dot.classList.toggle('w-8', i === currentSlide);
+                dot.classList.toggle('bg-gray-300', i !== currentSlide);
+            });
         }
-        imgElement.src = caminhoBase;
+
+        if (slidesImg.length > 1) {
+            let inter = setInterval(() => showSlide(currentSlide + 1), 5000);
+            document.getElementById('next-slide')?.addEventListener('click', () => { showSlide(currentSlide + 1); clearInterval(inter); });
+            document.getElementById('prev-slide')?.addEventListener('click', () => { showSlide(currentSlide - 1); clearInterval(inter); });
+        }
     }
 
-    // Atualiza os displays de preço e subtotal
-    window.atualizarTotal = function() {
-        const qtyElement = document.getElementById('qty-input');
-        const qty = parseInt(qtyElement.value) || 1;
-        
-        const total = precoAtual * qty;
-        
-        const displayTotal = document.getElementById('display-total');
-        if (displayTotal) {
-            displayTotal.innerText = total.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        }
-    };
-
-    // Lógica de troca de cor
+    // --- LÓGICA DE PRODUTOS COM CORES ---
     window.mudarCor = function(cor, btn) {
         corSelecionada = cor;
-        document.querySelectorAll('.color-btn').forEach(b => {
-            b.classList.remove('border-mm-blue', 'text-mm-blue', 'bg-blue-50');
-            b.classList.add('border-gray-200', 'text-gray-400');
-        });
-        btn.classList.add('border-mm-blue', 'text-mm-blue', 'bg-blue-50');
-
-        const tamanhosDisponiveis = variants.filter(v => v.cor === cor);
-        renderizarTamanhos(tamanhosDisponiveis);
+        document.querySelectorAll('.color-btn').forEach(b => b.classList.replace('border-mm-blue', 'border-gray-200'));
+        btn.classList.add('border-mm-blue');
+        renderizarTamanhos(variants.filter(v => v.cor === cor));
     };
 
-    // Lógica de troca de tamanho
-    window.mudarTamanho = function(variante, btn) {
-        tamanhoSelecionado = variante.tamanho;
-        precoAtual = variante.price;
+    window.mudarTamanho = function(v, btn) {
+        tamanhoSelecionado = v.tamanho;
+        precoAtual = v.price;
+        document.querySelectorAll('.size-btn').forEach(b => b.classList.replace('border-mm-blue', 'border-gray-200'));
+        btn.classList.add('border-mm-blue');
         
-        document.querySelectorAll('.size-btn').forEach(b => {
-            b.classList.remove('border-mm-blue', 'text-mm-blue', 'bg-blue-50');
-            b.classList.add('border-gray-200', 'text-gray-400');
-        });
-        btn.classList.add('border-mm-blue', 'text-mm-blue', 'bg-blue-50');
+        // No produto com cor, a imagem é trocada diretamente no ID main-img
+        const mainImg = document.getElementById('main-img');
+        if(mainImg) mainImg.src = v.img;
 
-        carregarImagemInteligente(variante.img);
-        
         document.getElementById('display-price').innerText = precoAtual.toFixed(2).replace('.', ',');
         window.atualizarTotal();
     };
 
-    // Renderiza botões de tamanho baseado na cor
     function renderizarTamanhos(lista) {
         const container = document.getElementById('size-options');
+        if(!container) return;
         container.innerHTML = '';
-
-        lista.forEach((v, index) => {
+        lista.forEach((v, i) => {
             const btn = document.createElement('button');
             btn.innerText = v.tamanho;
-            btn.className = `size-btn px-6 py-2 border-2 rounded-lg font-bold text-sm transition-all ${index === 0 ? 'border-mm-blue text-mm-blue bg-blue-50' : 'border-gray-200 text-gray-400'}`;
-            
+            btn.className = `size-btn px-4 py-2 border-2 rounded-lg font-bold text-xs ${i === 0 ? 'border-mm-blue text-mm-blue bg-blue-50' : 'border-gray-200 text-gray-400'}`;
             btn.onclick = () => window.mudarTamanho(v, btn);
             container.appendChild(btn);
-
-            if(index === 0) window.mudarTamanho(v, btn);
+            if(i === 0) window.mudarTamanho(v, btn);
         });
     }
 
-    // Adiciona ao carrinho com feedback visual
-    // Criamos uma variável fora da função para controlar o tempo
-let timeoutFeedback; 
+    window.atualizarTotal = function() {
+        if (!temVariantes) return;
+        const qty = parseInt(document.getElementById('qty-input').value) || 1;
+        document.getElementById('display-total').innerText = (precoAtual * qty).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+    };
 
-window.enviarCarrinhoFinal = function(event) {
-    const btn = event.currentTarget;
-    const btnContent = document.getElementById('btn-content');
-    
-    // Texto e ícone originais fixos (pra não bugar se clicar rápido)
-    const conteudoOriginal = `<i class="fas fa-cart-plus text-2xl"></i> <span>Adicionar ao Orçamento</span>`;
-
-    const qty = parseInt(document.getElementById('qty-input').value) || 1;
-    const img = document.getElementById('main-img').src;
-    const variacaoFull = `${corSelecionada} - ${tamanhoSelecionado}`;
-
-    if (window.adicionarComVariacaoInterna) {
-        // Envia para o carrinho (isso pode acontecer quantas vezes ele clicar)
-        window.adicionarComVariacaoInterna(slug, nome, codigo, img, qty, variacaoFull, precoAtual);
+    window.enviarCarrinhoFinal = function(event) {
+        const qty = parseInt(document.getElementById('qty-input').value) || 1;
+        const img = temVariantes ? document.getElementById('main-img').src : document.querySelector('#slider-container img[style*="opacity: 1"]')?.src;
+        window.adicionarComVariacaoInterna?.(slug, nome, codigo, img, qty, `${corSelecionada} - ${tamanhoSelecionado}`, precoAtual);
         
-        // --- LÓGICA DO FEEDBACK VISUAL ---
-        
-        // Se já houver um timer rodando, a gente cancela ele pra começar um novo
-        if (timeoutFeedback) clearTimeout(timeoutFeedback);
+        const btn = event.currentTarget;
+        const old = btn.innerHTML;
+        btn.style.backgroundColor = '#1489c8';
+        btn.innerHTML = '<span><i class="fas fa-check"></i> SOLICITADO!</span>';
+        setTimeout(() => { btn.style.backgroundColor = '#25D366'; btn.innerHTML = old; }, 1500);
+    };
 
-        // Forçamos o estado "Adicionado" (Azul)
-        btn.style.backgroundColor = '#1489c8'; // Cor mm-blue fixa
-        btnContent.innerHTML = '<i class="fas fa-check text-2xl"></i> <span>Adicionado!</span>';
-
-        // Marcamos o tempo para voltar ao normal (Verde)
-        timeoutFeedback = setTimeout(() => {
-            btn.style.backgroundColor = '#25D366'; // Volta pro verde
-            btnContent.innerHTML = conteudoOriginal;
-            timeoutFeedback = null; // Limpa a trava
-        }, 1500);
-
-    } else {
-        console.error("Erro: carrinho.js não carregado.");
-    }
-};
-
-    // Init
-    document.addEventListener('DOMContentLoaded', () => {
-        const primeiraCorBtn = document.querySelector('.color-btn');
-        if(primeiraCorBtn) window.mudarCor(corSelecionada, primeiraCorBtn);
-    });
+    if (temVariantes) window.mudarCor(corSelecionada, document.querySelector('.color-btn'));
 </script>
