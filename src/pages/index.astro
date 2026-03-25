@@ -5,14 +5,13 @@ import CategoriasDestaque from '../components/CategoriasDestaque.astro';
 import fs from 'node:fs';
 import path from 'node:path';
 
-// 1. Escaneia a pasta no momento do BUILD
+// 1. Lógica do Slideshow do Topo (Mantida)
 const fotosDir = path.join(process.cwd(), 'public/midia/fotos-destaques');
 let fotosLista = [];
 
 try {
     if (fs.existsSync(fotosDir)) {
         fotosLista = fs.readdirSync(fotosDir)
-            // Filtra imagens e ignora arquivos ocultos do sistema (tipo .DS_Store ou Thumbs.db)
             .filter(file => /\.(png|jpe?g|webp|avif|svg)$/i.test(file))
             .map(file => `/midia/fotos-destaques/${file}`);
     }
@@ -20,10 +19,34 @@ try {
     console.error("Erro ao ler a pasta de fotos:", e);
 }
 
-// Se a pasta estiver vazia, coloca uma imagem padrão pra não quebrar o layout
 if (fotosLista.length === 0) {
     fotosLista = ["/midia/gancho/canaletado/gancho-canaletado-preto-fundo-branco.png"];
 }
+
+// 2. DADOS REAIS DO SEU BLOG
+const ultimasNoticias = [
+    {
+        titulo: "Cinco formas de manter a sua loja organizada",
+        resumo: "Organizar a loja não é apenas estética; é estratégia. Uma boa organização facilita a experiência de compra e otimiza o giro de estoque.",
+        data: "15 Mar, 2023",
+        img: "/midia/blog/abcasa.jpg",
+        slug: "loja-organizada"
+    },
+    {
+        titulo: "5 Dicas para montar uma loja que se destaque",
+        resumo: "Existem sugestões que valem para qualquer loja e ramo. Levantamos as 5 principais para ajudar você a transformar seu ponto de venda.",
+        data: "25 Jan, 2023",
+        img: "/midia/blog/montar_loja.jpg",
+        slug: "dicas-montar-loja"
+    },
+    {
+        titulo: "Qual o tipo de suporte ideal para a sua loja?",
+        resumo: "A exposição correta gera valor. Entenda como os ganchos para painéis canaletados se adequam ao seu tipo de comércio.",
+        data: "01 Fev, 2023",
+        img: "/midia/blog/tipo_ideal.png",
+        slug: "suporte-ideal"
+    }
+];
 ---
 
 <LayoutBase title="MM Montagens - Home">
@@ -67,11 +90,44 @@ if (fotosLista.length === 0) {
 
     <CategoriasDestaque />
 
-    <section class="w-full pt-20 pb-12 bg-white relative">
-        <div class="container mx-auto px-8 lg:px-24 text-center">
-            <h3 class="text-mm-blue text-xs font-bold uppercase tracking-widest mb-2">NOSSO BLOG</h3>
-            <h2 class="text-gray-500 text-4xl font-bold mb-12">Veja as últimas notícias</h2>
+    <section class="w-full pt-20 pb-20 bg-white relative">
+        <div class="container mx-auto px-8 lg:px-24">
+            <div class="text-center mb-16">
+                <h3 class="text-mm-blue text-xs font-bold uppercase tracking-[0.3em] mb-3">CONHECIMENTO ESPECIALIZADO</h3>
+                <h2 class="text-gray-900 text-4xl font-black uppercase tracking-tighter">Últimas do Blog</h2>
+                <div class="w-20 h-1.5 bg-mm-yellow mx-auto mt-6"></div>
             </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                {ultimasNoticias.map((post) => (
+                    <a href={`/blog/${post.slug}`} class="group flex flex-col">
+                        <div class="relative h-64 w-full overflow-hidden rounded-3xl mb-6 shadow-md border border-gray-100">
+                            <img 
+                                src={post.img} 
+                                alt={post.titulo} 
+                                class="w-full h-full object-cover group-hover:scale-110 transition-all duration-700"
+                            />
+                            <div class="absolute inset-0 bg-gradient-to-t from-mm-darkblue/40 to-transparent"></div>
+                            <span class="absolute bottom-4 left-6 bg-white text-mm-blue text-[10px] font-black px-3 py-1 rounded-full uppercase shadow-sm">
+                                {post.data}
+                            </span>
+                        </div>
+                        
+                        <h4 class="text-xl font-black text-gray-900 leading-tight mb-4 group-hover:text-mm-blue transition-colors uppercase">
+                            {post.titulo}
+                        </h4>
+                        
+                        <p class="text-gray-500 text-sm leading-relaxed mb-6 line-clamp-3 font-medium">
+                            {post.resumo}
+                        </p>
+                        
+                        <div class="mt-auto flex items-center gap-2 text-mm-blue font-bold text-[11px] uppercase tracking-widest group-hover:gap-4 transition-all">
+                            Ler matéria completa <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </a>
+                ))}
+            </div>
+        </div>
     </section>
 
     <section class="w-full py-16 bg-mm-light relative">
@@ -81,37 +137,28 @@ if (fotosLista.length === 0) {
 </LayoutBase>
 
 <script>
+    // Script do Slideshow (Mantido)
     const dataEl = document.getElementById('slideshow-data');
     const fotos = JSON.parse(dataEl.dataset.photos || '[]');
-    
     const img1 = document.getElementById('hero-img-1') as HTMLImageElement;
     const img2 = document.getElementById('hero-img-2') as HTMLImageElement;
 
     if (fotos.length > 0 && img1 && img2) {
-        
         const trocar = () => {
-            // Fade out
             img1.style.opacity = '0';
             img2.style.opacity = '0';
             img1.style.transform = 'scale(0.95)';
-
             setTimeout(() => {
-                // Sorteia novas imagens
                 const idx1 = Math.floor(Math.random() * fotos.length);
                 let idx2 = Math.floor(Math.random() * fotos.length);
                 if (fotos.length > 1) while(idx2 === idx1) idx2 = Math.floor(Math.random() * fotos.length);
-
-                // Troca a fonte (usando encodeURI para evitar quebra com espaços)
                 img1.src = encodeURI(fotos[idx1]);
                 img2.src = encodeURI(fotos[idx2]);
-
-                // Fade in
                 img1.style.opacity = '1';
                 img2.style.opacity = '1';
                 img1.style.transform = 'scale(1)';
             }, 800);
         };
-
         setInterval(trocar, 4500);
     }
 </script>
