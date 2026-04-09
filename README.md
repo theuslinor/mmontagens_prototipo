@@ -1,43 +1,51 @@
-# Astro Starter Kit: Minimal
+# 🏗️ MM Montagens - E-commerce
 
-```sh
-npm create astro@latest -- --template minimal
-```
+Este é o site oficial da **MM Montagens**, fabricante especializada em soluções para organização e exposição de mercadorias (ganchos, gôndolas, balcões e suportes).
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+O projeto foi desenvolvido com foco em **performance**, **experiência do usuário (UX)** e **conversão direta via WhatsApp**.
 
-## 🚀 Project Structure
+---
 
-Inside of your Astro project, you'll see the following folders and files:
+## 🔗 Link do Projeto
+👉 https://www.mmontagens.com.br/
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
+---
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## 🚀 Funcionalidades Principais
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+### 🛒 Catálogo Interativo
+Listagem de produtos organizada por categorias com cards totalmente clicáveis.
 
-Any static assets, like images, can be placed in the `public/` directory.
+### 🎨 Sistema de Variações
+Página de produto dinâmica que permite selecionar cores e tamanhos, atualizando preços e imagens em tempo real.
 
-## 🧞 Commands
+### 💬 Orçamento via WhatsApp (Carrinho)
+Sistema de "Carrinho de Orçamentos" que armazena os itens localmente e gera uma mensagem formatada para o WhatsApp da empresa.
 
-All commands are run from the root of the project, from a terminal:
+### 🖼️ Galeria de Projetos
+Visualização de álbuns de montagens reais com navegação fluida (setas, teclado e contador de fotos).
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+### 📱 Design Responsivo
+Interface otimizada para dispositivos móveis, garantindo que o cliente consiga solicitar orçamentos de qualquer lugar.
 
-## 👀 Want to learn more?
+---
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+## 🛠️ Tecnologias Utilizadas
+
+O projeto foi construído utilizando tecnologias modernas do ecossistema web, garantindo alta performance e bons indicadores de **Core Web Vitals**:
+
+- ⚡ **Astro** — Framework focado em performance e entrega de zero JavaScript por padrão  
+- 🎨 **Tailwind CSS** — Framework utilitário para estilização rápida e consistente  
+- 🧠 **JavaScript (Vanilla)** — Lógica customizada para carrinho (LocalStorage), Lightbox e integrações  
+- 🔤 **FontAwesome** — Biblioteca de ícones  
+- 🗺️ **Google Maps API** — Integração de localização na página de contato  
+
+---
+
+## 👨‍💻 Desenvolvedor
+
+Projeto planejado e desenvolvido por:
+
+**Matheus dos Santos**
+
+- 🔗 LinkedIn: Matheus dos Santos(https://www.linkedin.com/in/matheus-dos-santos26/)
