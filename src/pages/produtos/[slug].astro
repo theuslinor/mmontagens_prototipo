@@ -43,7 +43,7 @@ const precoInicial = temVariantes ? prod.variants[0].price : 0;
                             id="main-img" 
                             src={prod.variants[0].img} 
                             alt={prod.nome} 
-                            class="max-h-full object-contain mix-blend-multiply transition-all duration-300"
+                            class="max-h-full object-contain mix-blend-multiply transition-all duration-300 rounded-xl"
                             onerror="this.src='/midia/logo4.png'"
                         />
                     ) : (
@@ -52,7 +52,7 @@ const precoInicial = temVariantes ? prod.variants[0].price : 0;
                                 <img 
                                     src={img} 
                                     alt={`${prod.nome} - ${index}`}
-                                    class={`absolute max-h-full object-contain mix-blend-multiply transition-all duration-1000 ease-in-out transform ${index === 0 ? 'opacity-100 scale-100 z-10' : 'opacity-0 scale-95 z-0'}`}
+                                    class={`absolute max-h-full object-contain mix-blend-multiply transition-all duration-1000 ease-in-out transform rounded-xl ${index === 0 ? 'opacity-100 scale-100 z-10' : 'opacity-0 scale-95 z-0'}`}
                                     data-index={index}
                                 />
                             ))}
@@ -235,7 +235,7 @@ const precoInicial = temVariantes ? prod.variants[0].price : 0;
         if(totalEl) totalEl.innerText = total;
     };
 
-    // --- FUNÇÃO FINAL CORRIGIDA (Captura de foto robusta) ---
+    // --- FUNÇÃO FINAL ---
     window.enviarCarrinhoFinal = function(event) {
         const qty = parseInt(document.getElementById('qty-input').value) || 1;
         
@@ -243,7 +243,7 @@ const precoInicial = temVariantes ? prod.variants[0].price : 0;
         if (temVariantes) {
             imgFinal = document.getElementById('main-img')?.src;
         } else {
-            // Tenta pegar a imagem com opacidade 1, mas se o CSS falhar, pega a primeira do slider
+            // Pega a imagem ativa do slider de forma segura
             const imgAtiva = document.querySelector('#slider-container img[style*="opacity: 1"]');
             imgFinal = imgAtiva ? imgAtiva.src : document.querySelector('#slider-container img')?.src;
         }

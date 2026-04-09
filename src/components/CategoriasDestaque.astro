@@ -20,7 +20,6 @@ const categorias = [
     nome: 'Balcão modulados',
     img: '/midia/balcao/balcao.jpg',
     icon: 'fas fa-th-large',
-    // Corrigido para a rota real que criamos
     link: '/produtos/categoria-balcoes'
   }
 ];
@@ -42,7 +41,7 @@ const categorias = [
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-20 -mb-64">
             {categorias.map((cat) => (
-                <div class="bg-white rounded-[40px] shadow-2xl overflow-hidden flex flex-col group hover:-translate-y-2 transition-transform duration-500">
+                <a href={cat.link} class="bg-white rounded-[40px] shadow-2xl overflow-hidden flex flex-col group hover:-translate-y-2 transition-transform duration-500 block">
                     
                     <div class="h-64 overflow-hidden relative">
                         <img src={cat.img} alt={cat.nome} class="w-full h-full object-cover group-hover:scale-110 transition duration-700" />
@@ -58,12 +57,12 @@ const categorias = [
                         <div class="flex items-center justify-between w-full mt-auto">
                             <span class="text-gray-100 text-6xl font-black select-none tracking-tighter">{cat.id}</span>
                             
-                            <a href={cat.link} class="w-14 h-14 bg-mm-blue rounded-full flex items-center justify-center text-white hover:bg-mm-yellow hover:text-mm-darkblue transition-all group/btn shadow-md">
-                                <i class="fas fa-arrow-right group-hover/btn:translate-x-1 transition-transform text-lg"></i>
-                            </a>
+                            <div class="w-14 h-14 bg-mm-blue rounded-full flex items-center justify-center text-white group-hover:bg-mm-yellow group-hover:text-mm-darkblue transition-all shadow-md">
+                                <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform text-lg"></i>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </a>
             ))}
         </div>
     </div>

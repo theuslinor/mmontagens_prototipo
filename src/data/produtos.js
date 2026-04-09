@@ -96,14 +96,14 @@ const rawData = [
         slug: 'gancho-barra-4-40mm',
         nome: 'Gancho para Barra de Gôndola 4.40mm',
         codigo: 'GPB-440',
-        img: '/midia/gancho/gancho-gondola/gancho-440mm-25cm-prateado',
+        img: '/midia/gancho/gancho-gondola/gancho-canaletado-25cm-440mm-preto',
         variants: [
           { cor: 'BRANCO', tamanho: '15 CM', price: 2.10, img: '/midia/gancho/gancho-gondola/gancho-canaletado-15cm-440mm-branco' },
           { cor: 'PRETO', tamanho: '15 CM', price: 2.10, img: '/midia/gancho/gancho-gondola/gancho-canaletado-15cm-440mm-preto' },
           { cor: 'BRANCO', tamanho: '20 CM', price: 2.50, img: '/midia/gancho/gancho-gondola/gancho-canaletado-20cm-440mm-branco' },
           { cor: 'PRETO', tamanho: '20 CM', price: 2.50, img: '/midia/gancho/gancho-gondola/gancho-canaletado-20cm-440mm-preto' },
-          { cor: 'BRANCO', tamanho: '25 CM', price: 2.80, img: '/midia/gancho/gancho-gondola/gancho-440mm-25cm-prateado' },
-          { cor: 'PRETO', tamanho: '25 CM', price: 2.80, img: '/midia/gancho/gancho-gondola/gancho-440mm-25cm-prateado' },
+          { cor: 'BRANCO', tamanho: '25 CM', price: 2.80, img: '/midia/gancho/gancho-gondola/gancho-canaletado-25cm-440mm-branco' },
+          { cor: 'PRETO', tamanho: '25 CM', price: 2.80, img: '/midia/gancho/gancho-gondola/gancho-canaletado-25cm-440mm-preto' },
         ]
       }
     ]
@@ -136,11 +136,11 @@ const rawData = [
     items: [
       {
         slug: 'suporte-expositor-facas', 
-        nome: '[MOSTRUÁRIO] Suporte Expositor para Facas',
+        nome: 'Suporte Expositor para Facas',
         codigo: 'SUP-001',
         img: '/midia/suportes/suporte-faca',
         variants: [
-          { cor: 'PADRÃO', tamanho: 'MODELO', price: 15.00, img: '/midia/suportes/suporte-faca' }
+          { cor: 'PADRÃO', tamanho: 'ÚNICO', price: 15.00, img: '/midia/suportes/suporte-faca' }
         ]
       }
     ]

@@ -3,7 +3,6 @@
 import LayoutBase from '../../layouts/LayoutBase.astro';
 import { categorias } from '../../data/produtos.js';
 
-// Filtramos a categoria de balcões do seu arquivo central de dados (id: 'balcoes')
 const categoria = categorias.find(cat => cat.id === 'balcoes');
 const produtos = categoria ? categoria.items : [];
 ---
@@ -15,7 +14,7 @@ const produtos = categoria ? categoria.items : [];
             <div class="mb-2">
                 <button 
                     onclick="history.back()" 
-                    class="inline-flex items-center gap-3 text-gray-400 hover:text-mm-blue font-bold transition-all group text-sm uppercase tracking-[0.2em]"
+                    class="inline-flex items-center gap-3 text-gray-400 hover:text-mm-blue font-bold transition-all group text-xs uppercase tracking-[0.2em]"
                 >
                     <div class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-blue-50 transition-colors shadow-sm">
                         <i class="fas fa-arrow-left"></i>
@@ -31,13 +30,13 @@ const produtos = categoria ? categoria.items : [];
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
                 {produtos.map(p => (
-                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden group">
+                    <a href={`/produtos/${p.slug}`} class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden group block">
                         
                         <div class="aspect-square bg-gray-50 p-8 flex items-center justify-center overflow-hidden">
                             <img 
                                 src={p.img} 
                                 alt={p.nome} 
-                                class="max-h-full object-contain mix-blend-multiply group-hover:scale-110 transition duration-500"
+                                class="max-h-full object-contain mix-blend-multiply group-hover:scale-110 transition duration-500 rounded-xl" 
                                 onerror="this.src='/midia/logo4.png'"
                             />
                         </div>
@@ -55,15 +54,13 @@ const produtos = categoria ? categoria.items : [];
                                         ? `R$ ${p.variants[0].price.toFixed(2).replace('.', ',')}` 
                                         : 'A Combinar'}
                                 </span>
-                                <a 
-                                    href={`/produtos/${p.slug}`} 
-                                    class="bg-mm-blue hover:bg-mm-darkblue text-white px-5 py-2.5 rounded-lg font-bold text-sm transition-all shadow-md hover:shadow-lg"
-                                >
+                                
+                                <div class="bg-mm-blue group-hover:bg-mm-darkblue text-white px-5 py-2.5 rounded-lg font-bold text-sm transition-all shadow-md">
                                     {p.variants && p.variants.length > 0 ? 'Ver Opções' : 'Ver Detalhes'}
-                                </a>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 ))}
             </div>
 

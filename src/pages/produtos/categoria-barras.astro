@@ -3,7 +3,6 @@
 import LayoutBase from '../../layouts/LayoutBase.astro';
 import { categorias } from '../../data/produtos.js';
 
-// Filtramos apenas a categoria de barras do seu produtos.js
 const categoria = categorias.find(cat => cat.id === 'barras');
 const produtos = categoria ? categoria.items : [];
 ---
@@ -15,7 +14,7 @@ const produtos = categoria ? categoria.items : [];
             <div class="mb-2">
                 <button 
                     onclick="history.back()" 
-                    class="inline-flex items-center gap-3 text-gray-400 hover:text-mm-blue font-bold transition-all group text-sm uppercase tracking-[0.2em]"
+                    class="inline-flex items-center gap-3 text-gray-400 hover:text-mm-blue font-bold transition-all group text-xs uppercase tracking-[0.2em]"
                 >
                     <div class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-blue-50 transition-colors shadow-sm">
                         <i class="fas fa-arrow-left"></i>
@@ -25,18 +24,19 @@ const produtos = categoria ? categoria.items : [];
             </div>
 
             <div class="flex items-center gap-4 mb-12 border-b border-gray-100 pb-6">
-                <i class="fas fa- bars text-mm-blue text-2xl"></i>
+                <i class="fas fa-bars text-mm-blue text-2xl"></i>
                 <h1 class="text-3xl font-black text-gray-900 uppercase tracking-tight">Barras Expositoras</h1>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
                 {produtos.map(p => (
-                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden group">
+                    <a href={`/produtos/${p.slug}`} class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden group block">
+                        
                         <div class="aspect-square bg-gray-50 p-8 flex items-center justify-center overflow-hidden">
                             <img 
-                                src="/midia/barra-expositora/barra-gondola-preta.png" 
+                                src={p.img} 
                                 alt={p.nome} 
-                                class="max-h-full object-contain mix-blend-multiply group-hover:scale-110 transition duration-500"
+                                class="max-h-full object-contain mix-blend-multiply group-hover:scale-110 transition duration-500 rounded-xl"
                                 onerror="this.src='/midia/logo4.png'"
                             />
                         </div>
@@ -51,21 +51,19 @@ const produtos = categoria ? categoria.items : [];
                                         ? `R$ ${p.variants[0].price.toFixed(2).replace('.', ',')}` 
                                         : 'Sob Consulta'}
                                 </span>
-                                <a 
-                                    href={`/produtos/${p.slug}`} 
-                                    class="bg-mm-blue hover:bg-mm-darkblue text-white px-5 py-2.5 rounded-lg font-bold text-sm transition-all shadow-md hover:shadow-lg"
-                                >
+                                
+                                <div class="bg-mm-blue group-hover:bg-mm-darkblue text-white px-5 py-2.5 rounded-lg font-bold text-sm transition-all shadow-md">
                                     Ver Opções
-                                </a>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 ))}
             </div>
 
             {produtos.length === 0 && (
-                <div class="text-center py-20">
-                    <p class="text-gray-400 font-bold">Nenhum produto encontrado nesta categoria.</p>
+                <div class="text-center py-20 border-2 border-dashed border-gray-100 rounded-2xl">
+                    <p class="text-gray-400 font-bold italic">Nenhum produto encontrado nesta categoria.</p>
                 </div>
             )}
         </div>

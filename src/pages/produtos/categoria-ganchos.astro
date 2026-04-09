@@ -2,7 +2,6 @@
 import LayoutBase from '../../layouts/LayoutBase.astro';
 import { categorias } from '../../data/produtos.js';
 
-// Filtramos apenas a categoria de ganchos
 const categoria = categorias.find(cat => cat.id === 'ganchos');
 const produtos = categoria ? categoria.items : [];
 ---
@@ -30,12 +29,13 @@ const produtos = categoria ? categoria.items : [];
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
                 {produtos.map(p => (
-                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden group">
+                    <a href={`/produtos/${p.slug}`} class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden group">
+                        
                         <div class="aspect-square bg-gray-50 p-8 flex items-center justify-center overflow-hidden">
                             <img 
                                 src={p.img} 
                                 alt={p.nome} 
-                                class="max-h-full object-contain mix-blend-multiply group-hover:scale-110 transition duration-500"
+                                class="max-h-full object-contain mix-blend-multiply group-hover:scale-110 transition duration-500 rounded-xl"
                             />
                         </div>
                         
@@ -45,17 +45,15 @@ const produtos = categoria ? categoria.items : [];
                             
                             <div class="mt-auto flex items-center justify-between">
                                 <span class="text-2xl font-black text-mm-blue">
-                                    R$ {p.variants[0].price.toFixed(2).replace('.', ',')}
+                                    R$ {p.variants && p.variants.length > 0 ? p.variants[0].price.toFixed(2).replace('.', ',') : "0,00"}
                                 </span>
-                                <a 
-                                    href={`/produtos/${p.slug}`} 
-                                    class="bg-mm-blue hover:bg-mm-darkblue text-white px-5 py-2.5 rounded-lg font-bold text-sm transition-all shadow-md hover:shadow-lg"
-                                >
+                                
+                                <div class="bg-mm-blue group-hover:bg-mm-darkblue text-white px-5 py-2.5 rounded-lg font-bold text-sm transition-all shadow-md">
                                     Ver Opções
-                                </a>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 ))}
             </div>
         </div>
