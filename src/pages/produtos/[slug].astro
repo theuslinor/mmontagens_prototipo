@@ -85,7 +85,7 @@ const precoInicial = temVariantes ? prod.variants[0].price : 0;
                             <div>
                                 <label class="block text-[10px] font-black text-gray-400 uppercase mb-3 tracking-widest">Selecione a Cor:</label>
                                 <div class="flex flex-wrap gap-2">
-                                    {coresUnicas.map((cor, index) => (
+                                    {coresUnicas.map((cor) => (
                                         <button 
                                             class="color-btn px-6 py-2 border-2 rounded-xl font-bold text-sm transition-all border-gray-200 text-gray-400 bg-white"
                                             onclick={`window.mudarCor('${cor}', this)`}
@@ -130,7 +130,7 @@ const precoInicial = temVariantes ? prod.variants[0].price : 0;
                         </div>
                     </div>
 
-                    <button onclick="window.enviarCarrinhoFinal(event)" class="w-full bg-[#25D366] hover:bg-[#1da851] text-white font-black py-5 rounded-2xl shadow-xl transition-all duration-300 flex justify-center items-center gap-4 text-xl uppercase">
+                    <button onclick="window.enviarCarrinhoFinal(event)" class="w-full bg-[#25D366] hover:bg-[#20ba5a] text-white font-black py-5 rounded-2xl shadow-xl transition-all duration-300 flex justify-center items-center gap-4 text-xl uppercase">
                         <span id="btn-content" class="flex items-center gap-4">
                             <i class="fas fa-cart-plus"></i> 
                             <span>{temVariantes ? "Adicionar ao Orçamento" : "Solicitar Orçamento"}</span>
@@ -185,14 +185,10 @@ const precoInicial = temVariantes ? prod.variants[0].price : 0;
     // --- LÓGICA DE CORES E BOTÕES ---
     window.mudarCor = function(cor, btn) {
         corSelecionada = cor;
-        
-        // Limpa todos os botões de cor
         document.querySelectorAll('.color-btn').forEach(b => {
             b.classList.remove(...activeClasses);
             b.classList.add(...inactiveClasses);
         });
-
-        // Ativa o botão clicado
         btn.classList.add(...activeClasses);
         btn.classList.remove(...inactiveClasses);
 
@@ -202,21 +198,18 @@ const precoInicial = temVariantes ? prod.variants[0].price : 0;
     window.mudarTamanho = function(v, btn) {
         tamanhoSelecionado = v.tamanho;
         precoAtual = v.price;
-
-        // Limpa todos os botões de tamanho
         document.querySelectorAll('.size-btn').forEach(b => {
             b.classList.remove(...activeClasses);
             b.classList.add(...inactiveClasses);
         });
-
-        // Ativa o botão clicado
         btn.classList.add(...activeClasses);
         btn.classList.remove(...inactiveClasses);
         
         const mainImg = document.getElementById('main-img');
         if(mainImg) mainImg.src = v.img;
 
-        document.getElementById('display-price').innerText = precoAtual.toFixed(2).replace('.', ',');
+        const priceEl = document.getElementById('display-price');
+        if(priceEl) priceEl.innerText = precoAtual.toFixed(2).replace('.', ',');
         window.atualizarTotal();
     };
 
@@ -227,12 +220,9 @@ const precoInicial = temVariantes ? prod.variants[0].price : 0;
         lista.forEach((v, i) => {
             const btn = document.createElement('button');
             btn.innerText = v.tamanho;
-            // Estilo inicial inativo
             btn.className = `size-btn px-4 py-2 border-2 rounded-lg font-bold text-xs transition-all ${inactiveClasses.join(' ')}`;
             btn.onclick = () => window.mudarTamanho(v, btn);
             container.appendChild(btn);
-            
-            // Auto-seleciona o primeiro tamanho da cor
             if(i === 0) window.mudarTamanho(v, btn);
         });
     }
@@ -241,15 +231,24 @@ const precoInicial = temVariantes ? prod.variants[0].price : 0;
         if (!temVariantes) return;
         const qty = parseInt(document.getElementById('qty-input').value) || 1;
         const total = (precoAtual * qty).toFixed(2).replace('.', ',');
-        document.getElementById('display-total').innerText = total;
+        const totalEl = document.getElementById('display-total');
+        if(totalEl) totalEl.innerText = total;
     };
 
+    // --- FUNÇÃO FINAL CORRIGIDA (Captura de foto robusta) ---
     window.enviarCarrinhoFinal = function(event) {
         const qty = parseInt(document.getElementById('qty-input').value) || 1;
-        const img = temVariantes ? document.getElementById('main-img').src : document.querySelector('#slider-container img[style*="opacity: 1"]')?.src;
         
-        // Chamada para a função do seu carrinho.js
-        window.adicionarComVariacaoInterna?.(slug, nome, codigo, img, qty, `${corSelecionada} - ${tamanhoSelecionado}`, precoAtual);
+        let imgFinal;
+        if (temVariantes) {
+            imgFinal = document.getElementById('main-img')?.src;
+        } else {
+            // Tenta pegar a imagem com opacidade 1, mas se o CSS falhar, pega a primeira do slider
+            const imgAtiva = document.querySelector('#slider-container img[style*="opacity: 1"]');
+            imgFinal = imgAtiva ? imgAtiva.src : document.querySelector('#slider-container img')?.src;
+        }
+        
+        window.adicionarComVariacaoInterna?.(slug, nome, codigo, imgFinal, qty, `${corSelecionada} - ${tamanhoSelecionado}`, precoAtual);
         
         const btn = event.currentTarget;
         const old = btn.innerHTML;
@@ -258,7 +257,6 @@ const precoInicial = temVariantes ? prod.variants[0].price : 0;
         setTimeout(() => { btn.style.backgroundColor = '#25D366'; btn.innerHTML = old; }, 1500);
     };
 
-    // Inicialização automática
     if (temVariantes) {
         const firstBtn = document.querySelector('.color-btn');
         if(firstBtn) window.mudarCor(corSelecionada, firstBtn);

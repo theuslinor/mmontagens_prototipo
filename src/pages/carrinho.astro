@@ -23,7 +23,6 @@
         }
     </script>
     <style>
-        /* Remove setinhas do input number */
         input::-webkit-outer-spin-button,
         input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
@@ -57,8 +56,7 @@
                     <div class="text-center">Ação</div>
                 </div>
 
-                <div id="lista-carrinho" class="flex flex-col">
-                    </div>
+                <div id="lista-carrinho" class="flex flex-col"></div>
                 
                 <div class="p-4 bg-gray-50 border-t border-gray-200 flex justify-between items-center">
                     <button onclick="limparCarrinho()" class="text-red-500 hover:text-red-700 text-sm font-bold flex items-center gap-2 transition">
@@ -86,6 +84,9 @@
                         <div class="flex items-baseline gap-1">
                             <span class="text-mm-blue font-bold text-xl">R$</span>
                             <span id="total-geral-carrinho" class="text-4xl font-black text-mm-blue leading-none">0,00</span>
+                        </div>
+                        <div id="aviso-orcamento" class="hidden">
+                            <span class="text-[10px] text-orange-500 font-bold uppercase mt-1">+ itens sob consulta</span>
                         </div>
                     </div>
                 </div>
@@ -116,12 +117,19 @@
 
     </section>
 
-    <script src="/carrinho.js" is:inline></script>
-
     <script is:inline>
+        const CHAVE = "mm_montagens_carrinho";
+
+        function getCarrinho() {
+            return JSON.parse(localStorage.getItem(CHAVE)) || [];
+        }
+
+        function salvarCarrinho(itens) {
+            localStorage.setItem(CHAVE, JSON.stringify(itens));
+        }
+
         function renderizarPaginaCarrinho() {
-            const itens = typeof getCarrinho === 'function' ? getCarrinho() : JSON.parse(localStorage.getItem("mm_montagens_carrinho")) || [];
-            
+            const itens = getCarrinho();
             const container = document.getElementById('lista-carrinho');
             const areaConteudo = document.getElementById('carrinho-conteudo');
             const areaVazia = document.getElementById('carrinho-vazio');
@@ -129,6 +137,7 @@
             const resumoProdutos = document.getElementById('resumo-total-produtos');
             const resumoPecas = document.getElementById('resumo-total-pecas');
             const displayTotalGeral = document.getElementById('total-geral-carrinho');
+            const avisoOrcamento = document.getElementById('aviso-orcamento');
 
             if (itens.length === 0) {
                 areaConteudo.classList.add('hidden');
@@ -142,6 +151,7 @@
 
             let totalPecas = 0;
             let valorTotalCompra = 0;
+            let temSobConsulta = false;
 
             itens.forEach((item, index) => {
                 const quantidade = parseInt(item.qty) || 0;
@@ -149,7 +159,20 @@
                 const subtotalItem = quantidade * precoUnitario;
                 
                 totalPecas += quantidade;
-                valorTotalCompra += subtotalItem;
+                
+                let unitarioHTML, subtotalHTML, corTexto;
+
+                if (precoUnitario <= 0) {
+                    unitarioHTML = "Sob Consulta";
+                    subtotalHTML = "A Combinar";
+                    corTexto = "text-orange-500";
+                    temSobConsulta = true;
+                } else {
+                    unitarioHTML = `R$ ${precoUnitario.toFixed(2).replace('.', ',')}`;
+                    subtotalHTML = `R$ ${subtotalItem.toFixed(2).replace('.', ',')}`;
+                    corTexto = "text-mm-blue";
+                    valorTotalCompra += subtotalItem;
+                }
                 
                 container.innerHTML += `
                     <div class="grid grid-cols-1 md:grid-cols-[1fr_120px_120px_60px] gap-4 p-4 md:p-6 border-b border-gray-100 items-center hover:bg-gray-50 transition">
@@ -160,7 +183,7 @@
                             <div class="flex flex-col">
                                 <h3 class="font-bold text-gray-800 text-sm leading-tight">${item.nome}</h3>
                                 <span class="text-[10px] text-gray-400 uppercase font-black mt-1 tracking-wider">${item.variacao || 'Padrão'}</span>
-                                <span class="text-[11px] text-mm-blue font-bold mt-1">UN: R$ ${precoUnitario.toFixed(2).replace('.', ',')}</span>
+                                <span class="text-[11px] ${corTexto} font-bold mt-1">UN: ${unitarioHTML}</span>
                             </div>
                         </div>
 
@@ -182,8 +205,8 @@
                             </div>
                         </div>
 
-                        <div class="text-right font-black text-gray-900 text-sm">
-                            R$ ${subtotalItem.toFixed(2).replace('.', ',')}
+                        <div class="text-right font-black ${precoUnitario <= 0 ? 'text-orange-500' : 'text-gray-900'} text-sm">
+                            ${subtotalHTML}
                         </div>
 
                         <div class="flex justify-center">
@@ -197,10 +220,12 @@
 
             resumoProdutos.innerText = itens.length;
             resumoPecas.innerText = totalPecas;
-            displayTotalGeral.innerText = valorTotalCompra.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            displayTotalGeral.innerText = valorTotalCompra.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+            
+            if (temSobConsulta) avisoOrcamento.classList.remove('hidden');
+            else avisoOrcamento.classList.add('hidden');
         }
 
-        // Funções Globais
         window.alterarQtd = function(index, valor) {
             let itens = getCarrinho();
             let novaQtd = (parseInt(itens[index].qty) || 1) + valor;
@@ -215,7 +240,6 @@
             let itens = getCarrinho();
             let novaQtd = parseInt(valor);
             if (isNaN(novaQtd) || novaQtd < 1) novaQtd = 1;
-            
             itens[index].qty = novaQtd;
             salvarCarrinho(itens);
             renderizarPaginaCarrinho();
@@ -230,31 +254,44 @@
 
         window.limparCarrinho = function() {
             if(confirm("Deseja esvaziar seu orçamento?")) {
-                localStorage.removeItem("mm_montagens_carrinho");
+                localStorage.removeItem(CHAVE);
                 renderizarPaginaCarrinho();
-                if(typeof atualizarIcones === 'function') atualizarIcones();
             }
         };
 
         window.enviarParaWhatsApp = function() {
             const itens = getCarrinho();
+            if (itens.length === 0) return;
+
             let texto = "Olá, MM Montagens! Gostaria de solicitar um orçamento:%0A%0A";
-            let totalGeral = 0;
+            let totalSoma = 0;
+            let temOrcamento = false;
             
             itens.forEach(i => { 
                 const preco = parseFloat(i.preco) || 0;
                 const subtotal = i.qty * preco;
-                totalGeral += subtotal;
-                texto += ` *${i.qty}x ${i.nome}*%0A`;
+                let uStr, sStr;
+
+                if (preco <= 0) {
+                    uStr = "A COMBINAR";
+                    sStr = "A COMBINAR";
+                    temOrcamento = true;
+                } else {
+                    uStr = `R$ ${preco.toFixed(2).replace('.', ',')}`;
+                    sStr = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
+                    totalSoma += subtotal;
+                }
+
+                texto += `*${i.qty}x ${i.nome}*%0A`;
                 texto += ` Opção: ${i.variacao}%0A`;
-                texto += ` UN: R$ ${preco.toFixed(2).replace('.', ',')} | *SUBTOTAL: R$ ${subtotal.toFixed(2).replace('.', ',')}*%0A%0A`;
+                texto += ` UN: ${uStr} | *SUBTOTAL: ${sStr}*%0A%0A`;
             });
             
             texto += `---------------------------------%0A`;
-            texto += ` *VALOR TOTAL: R$ ${totalGeral.toFixed(2).replace('.', ',')}*%0A%0A`;
+            const totalFinalStr = totalSoma > 0 ? `R$ ${totalSoma.toFixed(2).replace('.', ',')}` : "A COMBINAR";
+            texto += `*VALOR TOTAL ESTIMADO: ${totalFinalStr}*${(totalSoma > 0 && temOrcamento) ? ' (Mais itens a combinar)' : ''}%0A%0A`;
             texto += "Aguardamos o retorno com as condições de frete e faturamento.";
             
-            // Link corrigido para o seu número de Pernambuco
             window.open(`https://wa.me/5511998038196?text=${texto}`, "_blank");
         }
 
