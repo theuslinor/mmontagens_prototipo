@@ -48,4 +48,4 @@ Projeto planejado e desenvolvido por:
 
 **Matheus dos Santos**
 
-- 🔗 LinkedIn: Matheus dos Santos(https://www.linkedin.com/in/matheus-dos-santos26/)
+- 🔗 LinkedIn: [Matheus dos Santos](https://www.linkedin.com/in/matheus-dos-santos26/)
